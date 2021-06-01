@@ -1,5 +1,5 @@
 //
-//  LIbraryViewController.swift
+//  ProfileViewController.swift
 //  spotify
 //
 //  Created by Ather Hussain on 01/06/21.
@@ -7,7 +7,7 @@
 
 import UIKit
 
-class LIbraryViewController: UIViewController {
+class ProfileViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()

@@ -1,5 +1,5 @@
 //
-//  SearchViewController.swift
+//  WelcomeViewController.swift
 //  spotify
 //
 //  Created by Ather Hussain on 01/06/21.
@@ -7,12 +7,12 @@
 
 import UIKit
 
-class SearchViewController: UIViewController {
+class LoginViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        title = "Search"
-        view.backgroundColor = .systemBackground
+        title = "Spotify"
+        view.backgroundColor = .systemGreen
         // Do any additional setup after loading the view.
     }
     
