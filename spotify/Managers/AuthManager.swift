@@ -10,11 +10,19 @@ import Foundation
 final class AuthManger {
     static let shared = AuthManger()
     
+    struct Constants {
+        static let clientId = "Your_Client_Id"
+        static let clientSecret = "YOUR_CLIENT_SECRET"
+    }
+    
     private init () {}
     
-    struct Constants {
-        static let clientId = "YOUR_CLIENT_ID"
-        static let clientSecret = "YOUR_CLIENT_SECRET"
+    public var signInURL: URL? {
+        let base = "https://accounts.spotify.com/authorize"
+        let scope = "user-read-private"
+        let redirectUri = "https://yourside.com"
+        let string = "\(base)?response_type=code&client_id=\(Constants.clientId)&scope=\(scope)&redirect_uri=\(redirectUri)&show_dialog=TRUE"
+        return URL(string: string)
     }
     
     var isSignedIn: Bool{
@@ -33,5 +41,17 @@ final class AuthManger {
     }
     private var shouldRefreshToken: Bool{
         return false
+    }
+    
+    public func getCodeForToken(code:String, completion: @escaping ((Bool)->Void)){
+        
+    }
+    
+    private func cacheToken(){
+        
+    }
+    
+    private func refreshToken(){
+        
     }
 }
