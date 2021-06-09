@@ -30,6 +30,7 @@ class AuthViewController: UIViewController,WKNavigationDelegate {
         webView.navigationDelegate = self
         view.addSubview(webView)
         guard let url = AuthManger.shared.signInURL else{
+            print("Invalid URL")
             return
         }
         webView.load(URLRequest(url: url))
@@ -42,10 +43,12 @@ class AuthViewController: UIViewController,WKNavigationDelegate {
     
     func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
         guard let url = webView.url else{
+            print("webView Url is wrong")
             return
         }
         let components = URLComponents(string: url.absoluteString)
         guard let code = components?.queryItems?.first(where: {$0.name ==  "code"})?.value else{
+            print("URL Code is not found")
             return
         }
         webView.isHidden = true
