@@ -31,6 +31,8 @@ final class AuthManger {
         return accessToken != nil
     }
     
+    private var refreshingToken: Bool = false
+    
     private var accessToken: String?{
         return UserDefaults.standard.string(forKey: "access_token")
     }
@@ -96,7 +98,31 @@ final class AuthManger {
         task.resume()
     }
     
+    private var onRefreshBlock = [((String)->Void)]()
+    
+    //Supplies valid token to be used with API Calls
+    public func withValidToken(completion: @escaping ((String)->Void)){
+        guard !refreshingToken else{
+            onRefreshBlock.append(completion)
+            return
+        }
+        
+        if shouldRefreshToken{
+            shouldRefreshIfNeeded {[weak self] success in
+                if let token = self?.accessToken, success{
+                    completion(token)
+                }
+            }
+        } else if let token = accessToken{
+            completion(token)
+        }
+    }
+    
     public func shouldRefreshIfNeeded(completion: @escaping ((Bool)-> Void)){
+        guard !refreshingToken else{
+            return
+        }
+        
         guard shouldRefreshToken else{
             completion(true)
             return
@@ -110,6 +136,8 @@ final class AuthManger {
         guard let url = URL(string: Constants.tokenAPIURL) else{
             return
         }
+        
+        refreshingToken = true
         
         var components = URLComponents()
         components.queryItems = [
@@ -133,12 +161,15 @@ final class AuthManger {
         
         
         let task = URLSession.shared.dataTask(with: request) { [weak self] data, _, error in
+            self?.refreshingToken = false
             guard let data = data,error == nil else{
                 completion(false)
                 return
             }
             do{
                 let result = try JSONDecoder().decode(AuthResponse.self, from: data)
+                self?.onRefreshBlock.forEach { $0(result.access_token)}
+                self?.onRefreshBlock.removeAll()
                 self?.cacheToken(result:result)
                 completion(true)
             }
@@ -157,7 +188,7 @@ final class AuthManger {
             UserDefaults.standard.setValue(refresh_token, forKey: "refresh_token")
         }
         UserDefaults.standard.setValue(Date().addingTimeInterval(TimeInterval(result.expires_in)), forKey: "expirationDate")
-    
+        
     }
     
 }
