@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		6D118F86266A5D6000FCB31B /* AuthResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D118F85266A5D6000FCB31B /* AuthResponse.swift */; };
+		6D3F009C2678D60D00F8C9D3 /* SettingsModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D3F009B2678D60D00F8C9D3 /* SettingsModels.swift */; };
 		6DD8390826660953006EA214 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DD8390726660953006EA214 /* AppDelegate.swift */; };
 		6DD8390A26660953006EA214 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DD8390926660953006EA214 /* SceneDelegate.swift */; };
 		6DD8390C26660953006EA214 /* HomeViewContorller.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DD8390B26660953006EA214 /* HomeViewContorller.swift */; };
@@ -35,6 +36,7 @@
 
 /* Begin PBXFileReference section */
 		6D118F85266A5D6000FCB31B /* AuthResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthResponse.swift; sourceTree = "<group>"; };
+		6D3F009B2678D60D00F8C9D3 /* SettingsModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsModels.swift; sourceTree = "<group>"; };
 		6DD8390426660953006EA214 /* spotify.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = spotify.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		6DD8390726660953006EA214 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		6DD8390926660953006EA214 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -181,6 +183,7 @@
 				6DD839422666246E006EA214 /* Artist.swift */,
 				6DD839442666247B006EA214 /* UserProfile.swift */,
 				6D118F85266A5D6000FCB31B /* AuthResponse.swift */,
+				6D3F009B2678D60D00F8C9D3 /* SettingsModels.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -279,6 +282,7 @@
 				6DD839452666247B006EA214 /* UserProfile.swift in Sources */,
 				6DD83933266623D6006EA214 /* PlaylistViewController.swift in Sources */,
 				6DD839432666246E006EA214 /* Artist.swift in Sources */,
+				6D3F009C2678D60D00F8C9D3 /* SettingsModels.swift in Sources */,
 				6DD8390A26660953006EA214 /* SceneDelegate.swift in Sources */,
 				6DD83931266623C7006EA214 /* PlayerViewController.swift in Sources */,
 				6DD83935266623E1006EA214 /* SearchResultViewController.swift in Sources */,
