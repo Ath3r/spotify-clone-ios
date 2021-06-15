@@ -11,7 +11,7 @@ import SDWebImage
 class ProfileViewController: UIViewController,UITableViewDelegate,UITableViewDataSource {
     
     private let tableView: UITableView = {
-        let tableView = UITableView()
+        let tableView = UITableView( frame: CGRect(), style: .insetGrouped)
         tableView.isHidden = true
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: "Cell")
         return tableView
@@ -24,8 +24,8 @@ class ProfileViewController: UIViewController,UITableViewDelegate,UITableViewDat
         title = "Profile"
         tableView.delegate = self
         tableView.dataSource = self
-        view.addSubview(tableView)
         fetchProfile()
+        view.addSubview(tableView)
         view.backgroundColor = .systemBackground
     }
     override func viewDidLayoutSubviews() {
@@ -50,16 +50,17 @@ class ProfileViewController: UIViewController,UITableViewDelegate,UITableViewDat
     
     private func updateUI(with model: UserProfile){
         tableView.isHidden = false
-        
         models.append("Full Name: \(model.display_name)")
         models.append("Email Address: \(model.email)")
         models.append("User ID: \(model.id)")
         models.append("Plan: \(model.product)")
+        createTableHeader(with: model.images.first?.url)
         tableView.reloadData()
     }
     
     private func createTableHeader(with string: String?){
         guard let urlString = string,let url = URL(string: urlString) else{
+            print("Cannot find url image")
             return
         }
         let headerView = UIView(frame: CGRect(x: 0, y: 0, width: view.width, height: view.width/1.5))
@@ -68,6 +69,10 @@ class ProfileViewController: UIViewController,UITableViewDelegate,UITableViewDat
         let imageView = UIImageView(frame: CGRect(x: 0, y: 0, width: imageSize, height: imageSize))
         headerView.addSubview(imageView)
         imageView.center = headerView.center
+        imageView.contentMode = .scaleAspectFill
+        imageView.sd_setImage(with: url, completed: nil)
+        imageView.layer.masksToBounds = true
+        imageView.layer.cornerRadius = imageSize/2
         
         tableView.tableHeaderView = headerView
     }

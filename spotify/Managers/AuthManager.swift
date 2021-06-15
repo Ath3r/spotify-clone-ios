@@ -14,7 +14,7 @@ final class AuthManger {
         static let clientId = "YOUR_CLIENT_ID"
         static let clientSecret = "YOUR_CLIENT_SECRET"
         static let tokenAPIURL = "https://accounts.spotify.com/api/token"
-        static let redirectUri = "https://www.redirect.com"
+        static let redirectUri = "https://site.com"
         static let scope = "user-read-private%20playlist-modify-public%20playlist-read-private%20playlist-modify-private%20user-follow-read%20user-library-modify%20user-library-read%20user-read-email"
     }
     
@@ -23,7 +23,6 @@ final class AuthManger {
     public var signInURL: URL? {
         let base = "https://accounts.spotify.com/authorize"
         let string = "\(base)?response_type=code&client_id=\(Constants.clientId)&scope=\(Constants.scope)&redirect_uri=\(Constants.redirectUri)&show_dialog=TRUE"
-        print(string)
         return URL(string: string)
     }
     
@@ -118,13 +117,13 @@ final class AuthManger {
         }
     }
     
-    public func shouldRefreshIfNeeded(completion: @escaping ((Bool)-> Void)){
+    public func shouldRefreshIfNeeded(completion: ((Bool)-> Void)?){
         guard !refreshingToken else{
             return
         }
         
         guard shouldRefreshToken else{
-            completion(true)
+            completion?(true)
             return
         }
         
@@ -153,7 +152,7 @@ final class AuthManger {
         let basicToken = Constants.clientId+":"+Constants.clientSecret
         let data = basicToken.data(using: .utf8)
         guard let base64String = data?.base64EncodedString() else {
-            completion(false)
+            completion?(false)
             return
         }
         
@@ -163,7 +162,7 @@ final class AuthManger {
         let task = URLSession.shared.dataTask(with: request) { [weak self] data, _, error in
             self?.refreshingToken = false
             guard let data = data,error == nil else{
-                completion(false)
+                completion?(false)
                 return
             }
             do{
@@ -171,11 +170,11 @@ final class AuthManger {
                 self?.onRefreshBlock.forEach { $0(result.access_token)}
                 self?.onRefreshBlock.removeAll()
                 self?.cacheToken(result:result)
-                completion(true)
+                completion?(true)
             }
             catch{
                 print(error.localizedDescription)
-                completion(false)
+                completion?(false)
             }
         }
         task.resume()

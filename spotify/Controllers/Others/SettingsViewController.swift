@@ -18,12 +18,11 @@ class SettingsViewController: UIViewController,UITableViewDelegate,UITableViewDa
     
     private var sections = [Section]()
     
-    
-
     override func viewDidLoad() { 
         super.viewDidLoad()
         title = "Settings"
         view.backgroundColor = .systemBackground
+        configureModels()
         view.addSubview(tableView)
         tableView.dataSource = self
         tableView.delegate = self
@@ -35,7 +34,7 @@ class SettingsViewController: UIViewController,UITableViewDelegate,UITableViewDa
         tableView.frame = view.bounds
     }
     
-    func conigureModels() {
+    func configureModels() {
         sections.append(Section(title: "Profile", options: [Option(title: "View Your Profile", handler: { [weak self] in
             DispatchQueue.main.async {
                 self?.viewProfile()

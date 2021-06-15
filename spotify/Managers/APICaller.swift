@@ -22,22 +22,23 @@ final class APICaller{
     }
     
     public func getUserProfile(completion: @escaping ((Result<UserProfile,Error>) ->Void)){
-        createRequest(with: URL(string: "\(Constants.baseAPIURL)/me"), type: .GET) { baseRequest in
+        let url = "\(Constants.baseAPIURL)/me"
+        createRequest(with: URL(string: url), type: .GET) { baseRequest in
             let task = URLSession.shared.dataTask(with: baseRequest) { data, _, error in
                 guard let data = data, error == nil else{
+                    print("Failure to Get data")
                     completion(.failure(APIError.failedToGetData))
                     return
                 }
                 do{
                     let result = try JSONDecoder().decode(UserProfile.self, from: data)
-                    print(result)
                     completion(.success(result))
                 }
                 catch {
+                    print("Error Fetch UserProfile \(error.localizedDescription)")
                     completion(.failure(error))
                 }
             }
-            
             task.resume()
         }
     }
@@ -52,12 +53,15 @@ final class APICaller{
     private func createRequest(with url: URL?,type: HTTPMethod,completion: @escaping ((URLRequest)->Void)) {
         AuthManger.shared.withValidToken { token in
             guard let apiURL = url else{
+                print("Incorrect Url")
                 return
             }
             var request = URLRequest(url: apiURL)
             request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
             request.httpMethod = type.rawValue
             request.timeoutInterval = 30
+            request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+            completion(request)
         }
     }
 }
