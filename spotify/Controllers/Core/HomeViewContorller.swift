@@ -7,14 +7,7 @@
 
 import UIKit
 
-enum BrowseSectionType {
-    case newReleases(viewModels:[NewReleasesCellViewModel])
-    case featuredPlaylists(viewModels:[NewReleasesCellViewModel])
-    case recommendedTracks(viewModels:[NewReleasesCellViewModel])
-}
-
 class HomeViewContorller: UIViewController {
-    
     
     private var collectionView: UICollectionView = UICollectionView(
         frame: .zero,
@@ -61,7 +54,7 @@ class HomeViewContorller: UIViewController {
         collectionView.register(UICollectionViewCell.self, forCellWithReuseIdentifier: "cell")
         collectionView.register(NewReleaseCollectionViewCell.self, forCellWithReuseIdentifier: NewReleaseCollectionViewCell.identifier )
         collectionView.register(FeaturedCollectionViewCell.self, forCellWithReuseIdentifier: FeaturedCollectionViewCell.identifier)
-        collectionView.register(RecommendedCollectionViewCell.self, forCellWithReuseIdentifier: RecommendedCollectionViewCell.identifier)
+        collectionView.register(RecommendedTrackCollectionViewCell.self, forCellWithReuseIdentifier: RecommendedTrackCollectionViewCell.identifier)
         collectionView.dataSource = self
         collectionView.delegate = self
         collectionView.backgroundColor = .systemBackground
@@ -159,7 +152,7 @@ class HomeViewContorller: UIViewController {
                     heightDimension: .fractionalHeight(1.0)
                 ))
             
-            item.contentInsets = NSDirectionalEdgeInsets(top: 2, leading: 2, bottom: 2, trailing: 2)
+            item.contentInsets = NSDirectionalEdgeInsets(top: 4, leading: 4, bottom: 4, trailing: 4)
             
             // Vertical Group in Horizontal Group
             
@@ -284,9 +277,20 @@ class HomeViewContorller: UIViewController {
             )
         })))
         
-        sections.append(.featuredPlaylists(viewModels: []))
+        sections.append(.featuredPlaylists(viewModels: playlists.compactMap({
+            return FeaturedPlaylistViewModel(
+                name: $0.name,
+                artworkURL: URL(string: $0.images.first?.url ?? ""),
+                creatorName: $0.owner.display_name
+            )
+        })))
         
-        sections.append(.recommendedTracks(viewModels: []))
+        sections.append(.recommendedTracks(viewModels: tracks.compactMap({
+            return RecommendedTrackCellViewModel(
+                name: $0.name,
+                artistName: $0.artists.first?.name ?? "-",
+                coverImage: URL(string: $0.album.images.first?.url ?? ""))
+        })))
         collectionView.reloadData()
     }
     
@@ -336,15 +340,17 @@ extension HomeViewContorller: UICollectionViewDataSource, UICollectionViewDelega
             ) as? FeaturedCollectionViewCell else{
                 return UICollectionViewCell()
             }
-            cell.backgroundColor = .systemPink
+            let viewModel = viewModels[indexPath.row]
+            cell.configure(with: viewModel)
             return cell
         case .recommendedTracks(viewModels: let viewModels):
             guard let cell = collectionView.dequeueReusableCell(
-                withReuseIdentifier: RecommendedCollectionViewCell.identifier, for: indexPath
-            ) as? RecommendedCollectionViewCell else{
+                withReuseIdentifier: RecommendedTrackCollectionViewCell.identifier, for: indexPath
+            ) as? RecommendedTrackCollectionViewCell else{
                 return UICollectionViewCell()
             }
-            cell.backgroundColor = .systemGreen
+            let viewModel = viewModels[indexPath.row]
+            cell.configure(with: viewModel)
             return cell
         }
     }
