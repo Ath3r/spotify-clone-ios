@@ -52,7 +52,6 @@ final class APICaller{
                 }
                 do{
                     let result = try JSONDecoder().decode(NewReleasesResponse.self, from: data)
-                    print(result)
                     completion(.success(result))
                 }
                 catch{
@@ -74,7 +73,6 @@ final class APICaller{
                 }
                 do{
                     let result = try JSONDecoder().decode(FeaturedPlaylistsResponse.self, from: data)
-                    print(result)
                     completion(.success(result))
                 }
                 catch{
@@ -99,7 +97,6 @@ final class APICaller{
                 }
                 do{
                     let result = try JSONDecoder().decode(RecommendationsResponse.self, from: data)
-                    print(result)
                     completion(.success(result))
                 }
                 catch{
