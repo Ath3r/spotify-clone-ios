@@ -11,10 +11,10 @@ final class AuthManger {
     static let shared = AuthManger()
     
     struct Constants {
-        static let clientId = ""
-        static let clientSecret = ""
+        static let clientId = Spotify.clientId
+        static let clientSecret = Spotify.clientSecret
         static let tokenAPIURL = "https://accounts.spotify.com/api/token"
-        static let redirectUri = "https://site.com"
+        static let redirectUri = Spotify.websiteURL
         static let scope = "user-read-private%20playlist-modify-public%20playlist-read-private%20playlist-modify-private%20user-follow-read%20user-library-modify%20user-library-read%20user-read-email"
     }
     
