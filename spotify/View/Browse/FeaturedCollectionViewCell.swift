@@ -38,7 +38,6 @@ class FeaturedCollectionViewCell: UICollectionViewCell {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
-        
         contentView.layer.cornerRadius = 6
         
         contentView.backgroundColor = .secondarySystemBackground

@@ -8,10 +8,10 @@
 import Foundation
 
 struct FeaturedPlaylistsResponse: Codable {
-    let playlists: PlaylistResposne
+    let playlists: CategoryPlaylistResponse
 }
 
-struct PlaylistResposne: Codable {
+struct CategoryPlaylistResponse: Codable {
     let items: [Playlist]
 }
 
