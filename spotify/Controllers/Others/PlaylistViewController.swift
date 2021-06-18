@@ -25,6 +25,17 @@ class PlaylistViewController: UIViewController {
         super.viewDidLoad()
         title = playlist.name
         view.backgroundColor = .systemBackground
+        
+        APICaller.shared.getPlaylistDetail(for: playlist) { result in
+            switch result{
+            case .success(let model):
+                print(model)
+                break
+            case .failure(let error):
+                print(error.localizedDescription)
+                break
+            }
+        }
     }
 
 }
