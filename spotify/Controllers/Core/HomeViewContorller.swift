@@ -9,6 +9,10 @@ import UIKit
 
 class HomeViewContorller: UIViewController {
     
+    private var newAlbums: [Album] = []
+    private var playlists: [Playlist] = []
+    private var tracks: [AudioTrack] = []
+    
     private var collectionView: UICollectionView = UICollectionView(
         frame: .zero,
         collectionViewLayout: UICollectionViewCompositionalLayout { sectionIndex, _ -> NSCollectionLayoutSection? in
@@ -35,13 +39,14 @@ class HomeViewContorller: UIViewController {
             target: self,
             action: #selector(didTapSettings)
         )
-        
+                
         configreCollectionView()
         
         view.addSubview(spinner)
         
         fetchData()
     }
+    
     
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
@@ -261,12 +266,15 @@ class HomeViewContorller: UIViewController {
         
     }
     
+    
     private func configureModel(
         newAlbums:[Album],
         tracks: [AudioTrack],
         playlists:[Playlist]){
         
-        //Configure Models
+        self.newAlbums = newAlbums
+        self.playlists = playlists
+        self.tracks = tracks
         
         sections.append(.newReleases(viewModels: newAlbums.compactMap({
             return NewReleasesCellViewModel(
@@ -289,7 +297,7 @@ class HomeViewContorller: UIViewController {
             return RecommendedTrackCellViewModel(
                 name: $0.name,
                 artistName: $0.artists.first?.name ?? "-",
-                coverImage: URL(string: $0.album.images.first?.url ?? ""))
+                coverImage: URL(string: $0.album?.images.first?.url ?? ""))
         })))
         collectionView.reloadData()
     }
@@ -352,6 +360,28 @@ extension HomeViewContorller: UICollectionViewDataSource, UICollectionViewDelega
             let viewModel = viewModels[indexPath.row]
             cell.configure(with: viewModel)
             return cell
+        }
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        collectionView.deselectItem(at: indexPath, animated: true)
+        let section = sections[indexPath.section]
+        
+        switch section {
+        case .newReleases:
+            let album = newAlbums[indexPath.row]
+            let vc = AlbumViewController(album: album)
+            vc.title = album.name
+            vc.navigationItem.largeTitleDisplayMode = .never
+            navigationController?.pushViewController(vc, animated: true)
+        case .featuredPlaylists:
+            let playlist = playlists[indexPath.row]
+            let vc = PlaylistViewController(playlist: playlist)
+            vc.title = playlist.name
+            vc.navigationItem.largeTitleDisplayMode = .never
+            navigationController?.pushViewController(vc, animated: true)
+        case .recommendedTracks:
+            break
         }
     }
 }
