@@ -63,6 +63,100 @@ final class APICaller{
         }
     }
     
+    public func getCurrentUserPlaylist(completion: @escaping ((Result<[Playlist],Error>)->Void)) {
+        createRequest(with: URL(string: "\(Constants.baseAPIURL)/me/playlists"), type: .GET) { request in
+            let task = URLSession.shared.dataTask(with: request) { data, _, error in
+                guard let data = data, error == nil else{
+                    completion(.failure(APIError.failedToGetData))
+                    return
+                }
+                do{
+                    let result = try JSONDecoder().decode(LibraryPlaylistsResponse.self, from: data)
+                    completion(.success(result.items))
+                }catch{
+                    completion(.failure(error))
+                }
+            }
+            task.resume()
+        }
+    }
+    
+    
+    public func createPlaylist(with name: String, completion: @escaping ((Bool)->Void)) {
+        getUserProfile { [weak self] result in
+            switch result{
+            case .success(let profile):
+                let url = "\(Constants.baseAPIURL)/users/\(profile.id)/playlists"
+                self?.createRequest(with: URL(string: url), type: .POST){ baseRequest in
+                    var request = baseRequest
+                    let json = [
+                        "name": name
+                    ]
+                    request.httpBody = try? JSONSerialization.data(withJSONObject: json, options: .fragmentsAllowed)
+                    let task = URLSession.shared.dataTask(with: request) { data, _, error in
+                        guard let data = data, error == nil else{
+                            completion(false)
+                            return
+                        }
+                        do{
+                            let results = try JSONSerialization.jsonObject(with: data, options: .allowFragments)
+                            print(results)
+                        }catch{
+                            print(error.localizedDescription)
+                            completion(false)
+                        }
+                    }
+                    task.resume()
+                }
+                
+            case .failure(let error):
+                print(error.localizedDescription)
+                completion(false)
+            }
+        }
+    }
+    
+    public func addTrackToPlaylist(
+        track: AudioTrack,
+        playlist: Playlist,
+        completion: @escaping ((Bool)->Void)) {
+        createRequest(with: URL(string: "\(Constants.baseAPIURL)/"), type: .GET) { request in
+            let task = URLSession.shared.dataTask(with: request) { data, _, error in
+                guard let data = data, error == nil else{
+                    return
+                }
+                do{
+                    let result = try JSONSerialization.jsonObject(with: data, options: .allowFragments)
+                    print(result)
+                }catch{
+                }
+            }
+            task.resume()
+        }
+    }
+    
+    public func removeTrackFromPlaylist(
+        track: AudioTrack,
+        playlist: Playlist,
+        completion: @escaping ((Bool)->Void)) {
+        createRequest(with: URL(string: "\(Constants.baseAPIURL)/"), type: .GET) { request in
+            let task = URLSession.shared.dataTask(with: request) { data, _, error in
+                guard let data = data, error == nil else{
+                    completion(false)
+                    return
+                }
+                do{
+                    let result = try JSONSerialization.jsonObject(with: data, options: .allowFragments)
+                    print(result)
+                }catch{
+                    completion(false)
+                }
+            }
+            task.resume()
+        }
+    }
+    
+    
     //MARK: - Profile
     
     public func getUserProfile(completion: @escaping ((Result<UserProfile,Error>) ->Void)){
@@ -231,20 +325,20 @@ final class APICaller{
                     var searchResults: [SearchResult] = []
                     searchResults.append(
                         contentsOf: result.tracks.items.compactMap({
-                        SearchResult.track(model: $0)
-                    }))
+                            SearchResult.track(model: $0)
+                        }))
                     searchResults.append(
                         contentsOf: result.albums.items.compactMap({
-                        SearchResult.album(model: $0)
-                    }))
+                            SearchResult.album(model: $0)
+                        }))
                     searchResults.append(
                         contentsOf: result.artists.items.compactMap({
-                        SearchResult.artist(model: $0)
-                    }))
+                            SearchResult.artist(model: $0)
+                        }))
                     searchResults.append(
                         contentsOf: result.playlists.items.compactMap({
                             SearchResult.playlist(model: $0)
-                    }))
+                        }))
                     
                     completion(.success(searchResults))
                     
