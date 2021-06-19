@@ -104,7 +104,6 @@ extension CategoryViewController: UICollectionViewDelegate, UICollectionViewData
                 artworkURL: URL(string: playlist.images.first?.url ?? ""),
                 creatorName: playlist.owner.display_name)
         )
-        print("Configured with : \(playlist)")
         return cell
     }
     
@@ -112,7 +111,6 @@ extension CategoryViewController: UICollectionViewDelegate, UICollectionViewData
         collectionView.deselectItem(at: indexPath, animated: true)
         let playlist = playlists[indexPath.row]
         let vc = PlaylistViewController(playlist: playlist)
-        print("PlaylistView Controller Called ")
         vc.navigationItem.largeTitleDisplayMode = .never
         navigationController?.pushViewController(vc, animated: true)
     }

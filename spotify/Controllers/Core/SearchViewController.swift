@@ -62,6 +62,7 @@ class SearchViewController: UIViewController {
         
         searchController.searchResultsUpdater = self
         navigationItem.searchController = searchController
+        searchController.searchBar.delegate = self
         
         APICaller.shared.getCategories { [weak self] result in
             DispatchQueue.main.async {
@@ -89,7 +90,6 @@ extension SearchViewController: UISearchResultsUpdating{
               !query.trimmingCharacters(in: .whitespaces).isEmpty else{
             return
         }
-        //        APICaller.shared
     }
     
 }
@@ -130,4 +130,48 @@ extension SearchViewController: UICollectionViewDelegate, UICollectionViewDataSo
         navigationController?.pushViewController(vc, animated: true)
     }
     
+}
+
+extension SearchViewController: UISearchBarDelegate{
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        
+        guard let resultsController = searchController.searchResultsController as? SearchResultViewController,
+              let query = searchBar.text,
+              !query.trimmingCharacters(in: .whitespaces).isEmpty else{
+            return
+        }
+        resultsController.delegate = self
+        
+        APICaller.shared.search(with: query) { result in
+            DispatchQueue.main.async {
+                switch result{
+                case .success(let results):
+                    resultsController.update(with: results)
+                case .failure(let error):
+                    print(error.localizedDescription)
+                }
+            }
+        }
+    }
+}
+
+extension SearchViewController: SearchResultsViewControllerDelegate{
+    func didTapResults(_ results: SearchResult) {
+        switch results {
+        case .artist(model: let model):
+            break
+        case .album(model: let model):
+            let vc = AlbumViewController(album: model)
+            vc.navigationItem.largeTitleDisplayMode = .never
+            navigationController?.pushViewController(vc, animated: true)
+        case .track(model: let model):
+            break
+        case .playlist(model: let model):
+            let vc = PlaylistViewController(playlist: model)
+            vc.navigationItem.largeTitleDisplayMode = .never
+            navigationController?.pushViewController(vc, animated: true)
+        }
+    }
+    
+
 }
