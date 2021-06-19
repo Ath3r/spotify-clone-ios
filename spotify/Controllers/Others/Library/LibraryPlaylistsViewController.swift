@@ -13,11 +13,26 @@ class LibraryPlaylistsViewController: UIViewController {
     
     private let noPlaylistView = ActionLabelView()
     
+    private let tableView: UITableView = {
+        let tableView = UITableView(frame: .zero, style: .grouped)
+        tableView.backgroundColor = .systemBackground
+        tableView.isHidden = true
+        tableView.register(UITableViewCell.self, forCellReuseIdentifier: "cell")
+        tableView.register(
+            SearchResultSubtitleTableViewCell.self,
+            forCellReuseIdentifier: SearchResultSubtitleTableViewCell.identifer
+        )
+        return tableView
+    }()
+    
     
     override func viewDidLoad() {
         super.viewDidLoad()
         view.addSubview(noPlaylistView)
+        view.addSubview(tableView)
         noPlaylistView.delegate = self
+        tableView.delegate = self
+        tableView.dataSource = self
         setupNoPlaylistView()
         fetchData()
     }
@@ -26,6 +41,7 @@ class LibraryPlaylistsViewController: UIViewController {
         super.viewDidLayoutSubviews()
         noPlaylistView.frame = CGRect(x: 0, y: 0, width: 150, height: 150)
         noPlaylistView.center = view.center
+        tableView.frame = view.bounds
     }
     
     private func setupNoPlaylistView(){
@@ -56,15 +72,14 @@ class LibraryPlaylistsViewController: UIViewController {
         if playlists.isEmpty{
             print("No Playlist")
             noPlaylistView.isHidden = false
+            tableView.isHidden = true
         }else{
-            //Show table
+            tableView.isHidden = false
+            noPlaylistView.isHidden = true
+            tableView.reloadData()
         }
     }
-}
-extension LibraryPlaylistsViewController: ActionLabelViewDeleagete{
-    
-    func actionLabelViewDidTapButton(_ actionView: ActionLabelView) {
-        //Push VC to create a playlist
+    func createPlaylistAlert(){
         let alert = UIAlertController(
             title: "New Playlist",
             message: "Enter Playlist Name",
@@ -80,15 +95,52 @@ extension LibraryPlaylistsViewController: ActionLabelViewDeleagete{
                   !text.trimmingCharacters(in: .whitespaces).isEmpty else{
                 return
             }
-            APICaller.shared.createPlaylist(with: text) { success in
+            APICaller.shared.createPlaylist(with: text) {[weak self] success in
                 if success{
-                    //Refresh View
+                    self?.fetchData()
                 } else{
                     print("Failed to create playlist")
                 }
             }
         }))
         present(alert, animated: true)
+    }
+}
+extension LibraryPlaylistsViewController: ActionLabelViewDeleagete{
+    
+    func actionLabelViewDidTapButton(_ actionView: ActionLabelView) {
+        createPlaylistAlert()
+    }
+    
+}
+extension LibraryPlaylistsViewController: UITableViewDelegate,UITableViewDataSource{
+    
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return playlists.count
+    }
+    
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        guard let cell = tableView.dequeueReusableCell(
+                withIdentifier: SearchResultSubtitleTableViewCell.identifer,
+                for: indexPath
+        ) as? SearchResultSubtitleTableViewCell else{
+            return UITableViewCell()
+        }
+        let playlist = playlists[indexPath.row]
+        cell.configure(with: SearchResultSubtitleTableViewCellViewModel(
+                        title: playlist.name,
+                        imageURL: URL(string: playlist.images.first?.url ?? ""),
+                        subtitle: playlist.owner.display_name)
+        )
+        return cell
+    }
+    
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        return 70
+    }
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        tableView.deselectRow(at: indexPath, animated: true)
     }
     
 }

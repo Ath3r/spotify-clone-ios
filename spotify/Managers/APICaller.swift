@@ -100,7 +100,11 @@ final class APICaller{
                         }
                         do{
                             let results = try JSONSerialization.jsonObject(with: data, options: .allowFragments)
-                            print(results)
+                            if let response = results as? [String:Any], response["id"] as? String != nil{
+                                completion(true)
+                            }else{
+                                completion(false)
+                            }
                         }catch{
                             print(error.localizedDescription)
                             completion(false)
