@@ -12,6 +12,8 @@ final class PlayerControlsView: UIView {
     
     weak var delegate: PlayerControlsViewDelegate?
     
+    private var isPlaying = true
+    
     private let volumeSlider: UISlider = {
         let slider = UISlider()
         slider.value = 0.5
@@ -85,6 +87,7 @@ final class PlayerControlsView: UIView {
         
         clipsToBounds = true
         
+        volumeSlider.addTarget(self, action: #selector(didSlideSlider(_:)), for: .valueChanged)
         backButton.addTarget(self, action: #selector(didTapBack), for: .touchUpInside)
         nextButton.addTarget(self, action: #selector(didTapNext), for: .touchUpInside)
         pausePlayButton.addTarget(self, action: #selector(didTapPausePlay), for: .touchUpInside)
@@ -130,11 +133,36 @@ final class PlayerControlsView: UIView {
     }
     
     @objc private func didTapPausePlay(){
+        self.isPlaying = !isPlaying
         delegate?.playerControlsViewDidTapPlayPause(self)
+        let pause = UIImage(
+            systemName: "pause",
+            withConfiguration: UIImage.SymbolConfiguration(
+                pointSize: 34,
+                weight: .regular)
+        )
+        let play = UIImage(
+            systemName: "play.fill",
+            withConfiguration: UIImage.SymbolConfiguration(
+                pointSize: 34,
+                weight: .regular)
+        )
+        
+        pausePlayButton.setImage(isPlaying ? pause : play, for: .normal)
     }
     
     @objc private func didTapNext(){
         delegate?.playerControlsViewDidTapForwardButton(self)
+    }
+    
+    @objc private func didSlideSlider(_ slider: UISlider){
+        let value = slider.value
+        delegate?.playerControlsView(self, didSlideSlider: value)
+    }
+    
+    func configure(with viewModel: PlayerControlsViewViewModel){
+        nameLabel.text = viewModel.title
+        subtitleLabel.text = viewModel.subtitle
     }
     
 }

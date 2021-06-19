@@ -11,4 +11,5 @@ protocol PlayerControlsViewDelegate: AnyObject {
     func playerControlsViewDidTapPlayPause(_ playerControlView: PlayerControlsView)
     func playerControlsViewDidTapForwardButton(_ playerControlView: PlayerControlsView)
     func playerControlsViewDidTapBackwardsButton(_ playerControlView: PlayerControlsView)
+    func playerControlsView(_ playerControlView: PlayerControlsView, didSlideSlider value: Float)
 }
