@@ -124,15 +124,29 @@ final class APICaller{
         track: AudioTrack,
         playlist: Playlist,
         completion: @escaping ((Bool)->Void)) {
-        createRequest(with: URL(string: "\(Constants.baseAPIURL)/"), type: .GET) { request in
+        createRequest(with: URL(string: "\(Constants.baseAPIURL)/playlists/\(playlist.id)/tracks"), type: .POST) {
+            baseRequest in
+            var request = baseRequest
+            let json = [
+                "uris": ["spotify:track:\(track.id)"]
+            ]
+            request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+            request.httpBody = try? JSONSerialization.data(withJSONObject: json, options: .fragmentsAllowed)
             let task = URLSession.shared.dataTask(with: request) { data, _, error in
                 guard let data = data, error == nil else{
+                    completion(false)
                     return
                 }
                 do{
-                    let result = try JSONSerialization.jsonObject(with: data, options: .allowFragments)
-                    print(result)
+                    let results = try JSONSerialization.jsonObject(with: data, options: .allowFragments)
+                    if let response = results as? [String:Any], response["snapshot_id"] as? String != nil{
+                        completion(true)
+                    }else{
+                        completion(false)
+                    }
                 }catch{
+                    print(error.localizedDescription)
+                    completion(false)
                 }
             }
             task.resume()

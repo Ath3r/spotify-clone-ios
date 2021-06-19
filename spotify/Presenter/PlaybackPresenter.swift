@@ -125,6 +125,7 @@ extension PlaybackPresenter: PlayerViewControllerDelegate{
     func didTapBackward() {
         if tracks.isEmpty{
             player?.pause()
+            player?.seek(to: .zero)
             player?.play()
         }else if let firstItem = playerQueue?.items().first{
             playerQueue?.pause()
