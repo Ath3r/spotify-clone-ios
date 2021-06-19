@@ -436,7 +436,7 @@ extension HomeViewContorller: UICollectionViewDataSource, UICollectionViewDelega
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         collectionView.deselectItem(at: indexPath, animated: true)
         let section = sections[indexPath.section]
-        
+        HapticsManager.shared.vibrateForSelection()
         switch section {
         case .newReleases:
             let album = newAlbums[indexPath.row]
