@@ -42,6 +42,47 @@ final class APICaller{
         }
     }
     
+    public func getUserAlbums(completion: @escaping ((Result<[Album],Error>)->Void)){
+        createRequest(with: URL(string: "\(Constants.baseAPIURL)/me/albums"), type: .GET) { request in
+            let task = URLSession.shared.dataTask(with: request) { data, _, error in
+                guard let data = data, error == nil else{
+                    completion(.failure(APIError.failedToGetData))
+                    return
+                }
+                do{
+                    print(try JSONSerialization.jsonObject(with: data, options: .allowFragments))
+                    let result = try JSONDecoder().decode(LibraryAlbumResponse.self, from: data)
+                    completion(.success(result.items.compactMap({
+                        $0.album
+                    })))
+                }catch{
+                    completion(.failure(error))
+                }
+            }
+            
+            task.resume()
+        }
+    }
+    
+    public func saveAlbum(album: Album,completion: @escaping ((Bool)->Void)){
+        createRequest(with: URL(string: "\(Constants.baseAPIURL)/me/albums?ids=\(album.id)"), type: .PUT) { baseRequest in
+            var request = baseRequest
+            request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+            let task = URLSession.shared.dataTask(with: request) { _, response, error in
+                guard let code = (response as? HTTPURLResponse)?.statusCode,
+                error == nil else{
+                    completion(false)
+                    return
+                }
+                completion(code>=200 && code<=299)
+            }
+            task.resume()
+        }
+    }
+    
+    
+    
+    
     //MARK: - Playlists
     
     public func getPlaylistDetail(for playlist: Playlist, completion: @escaping ((Result<PlaylistDetailsResponse,Error>)->Void)){
@@ -393,6 +434,7 @@ final class APICaller{
         case GET
         case POST
         case DELETE
+        case PUT
     }
     
     private func createRequest(with url: URL?,type: HTTPMethod,completion: @escaping ((URLRequest)->Void)) {

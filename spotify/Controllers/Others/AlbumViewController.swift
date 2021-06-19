@@ -66,8 +66,42 @@ class AlbumViewController: UIViewController {
         title = album.name
         view.backgroundColor = .systemBackground
         
-        view.addSubview(collectionView)
+        configureCollectionView()
+        fetchDate()
         
+        navigationItem.rightBarButtonItem = UIBarButtonItem(
+            barButtonSystemItem: .action,
+            target: self,
+            action: #selector(didTapActions)
+        )
+    }
+    
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        collectionView.frame = view.bounds
+    }
+    
+    @objc func didTapActions(){
+        let actionSheet = UIAlertController(title: album.name, message: "Actions", preferredStyle: .actionSheet)
+        actionSheet.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
+        actionSheet.addAction(UIAlertAction(title: "Save Album", style: .default, handler: { [weak self] _ in
+            guard let self = self else{
+                return
+            }
+            APICaller.shared.saveAlbum(album: self.album) { success in
+                DispatchQueue.main.async {
+                    if success{
+                        NotificationCenter.default.post(name: .albumSavedNotification, object: nil)
+                    }
+                }
+                
+            }
+        }))
+        present(actionSheet, animated: true)
+    }
+    
+    private func configureCollectionView(){
+        view.addSubview(collectionView)
         collectionView.backgroundColor = .systemBackground
         
         collectionView.register(UICollectionViewCell.self, forCellWithReuseIdentifier: "cell")
@@ -82,14 +116,17 @@ class AlbumViewController: UIViewController {
         
         collectionView.delegate = self
         collectionView.dataSource = self
-        
+    }
+    
+    
+    private func fetchDate(){
         APICaller.shared.getAlbumsDetails(for: album) { [weak self] result in
             DispatchQueue.main.async {
                 switch result{
                 case .success(let model):
                     self?.tracks = model.tracks.items
                     self?.viewModels = model.tracks.items.compactMap({
-                       AlbumCollectionViewCellViewModel(
+                        AlbumCollectionViewCellViewModel(
                             name: $0.name,
                             artistName: $0.artists.first?.name ?? "-"
                         )
@@ -101,11 +138,6 @@ class AlbumViewController: UIViewController {
                 }
             }
         }
-    }
-    
-    override func viewDidLayoutSubviews() {
-        super.viewDidLayoutSubviews()
-        collectionView.frame = view.bounds
     }
     
 }
