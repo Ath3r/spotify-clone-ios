@@ -18,6 +18,14 @@ class SearchResultViewController: UIViewController {
         let tableView = UITableView()
         tableView.backgroundColor = .systemBackground
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: "cell")
+        tableView.register(
+            SearchResultDefaultTableViewCell.self,
+            forCellReuseIdentifier: SearchResultDefaultTableViewCell.identifer
+        )
+        tableView.register(
+            SearchResultSubtitleTableViewCell.self,
+            forCellReuseIdentifier: SearchResultSubtitleTableViewCell.identifer
+        )
         tableView.isHidden = true
         return tableView
     }()
@@ -94,18 +102,72 @@ extension SearchResultViewController: UITableViewDelegate,UITableViewDataSource{
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let result = sections[indexPath.section].results[indexPath.row]
-        let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
         switch result {
         case .artist(model: let model):
-            cell.textLabel?.text = model.name
+            guard let cell = tableView.dequeueReusableCell(
+                    withIdentifier: SearchResultDefaultTableViewCell.identifer,
+                    for: indexPath
+            ) as? SearchResultDefaultTableViewCell else {
+                return UITableViewCell()
+            }
+            cell.configure(
+                with: SearchResultDefaultTableViewCellViewModel(
+                    title: model.name,
+                    imageURL: URL(
+                        string: model.images?.first?.url ?? ""
+                    )
+                )
+            )
+            return cell
         case .album(model: let model):
-            cell.textLabel?.text = model.name
+            guard let cell = tableView.dequeueReusableCell(
+                withIdentifier: SearchResultSubtitleTableViewCell.identifer,
+                for: indexPath
+            ) as? SearchResultSubtitleTableViewCell else{
+                return UITableViewCell()
+            }
+            cell.configure(
+                with: SearchResultSubtitleTableViewCellViewModel(
+                    title: model.name,
+                    imageURL: URL(
+                        string: model.images.first?.url ?? ""),
+                    subtitle: model.artists.first?.name ?? "-"
+                )
+            )
+            return cell
         case .track(model: let model):
-            cell.textLabel?.text = model.name
+            guard let cell = tableView.dequeueReusableCell(
+                withIdentifier: SearchResultSubtitleTableViewCell.identifer,
+                for: indexPath
+            ) as? SearchResultSubtitleTableViewCell else{
+                return UITableViewCell()
+            }
+            cell.configure(
+                with: SearchResultSubtitleTableViewCellViewModel(
+                    title: model.name,
+                    imageURL: URL(
+                        string: model.album?.images.first?.url ?? ""),
+                    subtitle: model.artists.first?.name ?? "-"
+                )
+            )
+            return cell
         case .playlist(model: let model):
-            cell.textLabel?.text = model.name
+            guard let cell = tableView.dequeueReusableCell(
+                withIdentifier: SearchResultSubtitleTableViewCell.identifer,
+                for: indexPath
+            ) as? SearchResultSubtitleTableViewCell else{
+                return UITableViewCell()
+            }
+            cell.configure(
+                with: SearchResultSubtitleTableViewCellViewModel(
+                    title: model.name,
+                    imageURL: URL(
+                        string: model.images.first?.url ?? ""),
+                    subtitle: model.owner.display_name
+                )
+            )
+            return cell
         }
-        return cell
     }
     
     func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
