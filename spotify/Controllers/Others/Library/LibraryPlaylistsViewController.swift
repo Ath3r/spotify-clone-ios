@@ -79,7 +79,6 @@ class LibraryPlaylistsViewController: UIViewController {
     }
     
     private func updateUI(){
-        print(playlists)
         if playlists.isEmpty{
             print("No Playlist")
             noPlaylistView.isHidden = false
@@ -109,6 +108,7 @@ class LibraryPlaylistsViewController: UIViewController {
             APICaller.shared.createPlaylist(with: text) {[weak self] success in
                 if success{
                     self?.fetchData()
+                    
                 } else{
                     print("Failed to create playlist")
                 }
@@ -161,6 +161,8 @@ extension LibraryPlaylistsViewController: UITableViewDelegate,UITableViewDataSou
         }
         let vc = PlaylistViewController(playlist: playlist)
         vc.navigationItem.largeTitleDisplayMode = .never
+        vc.isOwner = true
         navigationController?.pushViewController(vc, animated: true)
     }
+    
 }

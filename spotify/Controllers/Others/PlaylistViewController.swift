@@ -13,6 +13,8 @@ class PlaylistViewController: UIViewController {
     
     private var tracks = [AudioTrack]()
     
+    public var isOwner = false
+    
     private let collectionView = UICollectionView(
         frame: .zero,
         collectionViewLayout: UICollectionViewCompositionalLayout(
@@ -113,6 +115,47 @@ class PlaylistViewController: UIViewController {
             target: self,
             action: #selector(didTapShare)
         )
+        addGesture()
+    }
+    
+    private func addGesture(){
+        let gesture = UILongPressGestureRecognizer(target: self, action: #selector(didSwipeToDelete(_:)))
+        collectionView.addGestureRecognizer(gesture)
+    }
+    
+    @objc private func didSwipeToDelete(_ gesture: UILongPressGestureRecognizer){
+        guard gesture.state == .began else{
+            return
+        }
+        let touchPoint = gesture.location(in: collectionView)
+        guard let indexPath = collectionView.indexPathForItem(at: touchPoint) else{
+            return
+        }
+        let trackToDelete = tracks[indexPath.row]
+        let actionSheet = UIAlertController(
+            title: "Remove",
+            message: "Would your like to remove \(trackToDelete.name)",
+            preferredStyle: .actionSheet
+        )
+        actionSheet.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
+        actionSheet.addAction(UIAlertAction(title: "Remove", style: .destructive, handler: {[weak self] _ in
+            guard let self = self else{
+                return
+            }
+            APICaller.shared.removeTrackFromPlaylist(track: trackToDelete, playlist: self.playlist) {
+                success in
+                DispatchQueue.main.async {
+                    if success{
+                        self.tracks.remove(at: indexPath.row)
+                        self.viewModels.remove(at: indexPath.row)
+                        self.collectionView.reloadData()
+                    }else{
+                        print("Failed to Delete")
+                    }
+                }
+            }
+        }))
+        present(actionSheet, animated: true)
     }
     
     @objc private func didTapShare(){
@@ -178,6 +221,8 @@ extension PlaylistViewController: UICollectionViewDataSource,UICollectionViewDel
         let track = tracks[index]
         PlaybackPresenter.shared.startPlayback(from: self, track: track)
     }
+    
+    
 }
 
 extension PlaylistViewController: PlaylistHeaderCollectionReusableViewDelegate{
@@ -185,4 +230,3 @@ extension PlaylistViewController: PlaylistHeaderCollectionReusableViewDelegate{
         PlaybackPresenter.shared.startPlayback(from: self, tracks: tracks)
     }
 }
-
