@@ -46,4 +46,8 @@ Navigate into spotify-clone-ios and install the necessary packages
  pod install
 ```
 
-Open the xcworkspace file created by the CocoaPods and start the simulator
+Open the xcworkspace file created by the CocoaPods
+
+Go to `/Managers/AuthManager.swift`
+
+Update the ClientId, ClientSecret and redirectURI(Your website URL) which you can get it from [here](https://developer.spotify.com/dashboard/applications).
