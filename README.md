@@ -5,7 +5,7 @@ A UIKit clone project of the Spotify app.
 ## Table of Content
 
 - [Description](#description)
-- [Tech/Frameworks Used](#frameworks)
+- [Tech/Frameworks Used](#techframework-used)
 - [Installation](#installation)
 
 ## Description
@@ -37,7 +37,7 @@ This project requires [Xcode](https://developer.apple.com/xcode/) and [CocoaPods
 Clone the repository to a directory of your choosing
 
 ```sh
- git clonehttps://github.com/Ath3r/spotify-clone-ios
+ git clone https://github.com/Ath3r/spotify-clone-ios
 ```
 
 Navigate into spotify-clone-ios and install the necessary packages
